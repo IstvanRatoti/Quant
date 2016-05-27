@@ -37,7 +37,21 @@ public abstract class LifeObjective {
 	}
 	
 	/* sets the Type value of the object */
-	public void setType(Type type) {
-		this.type = type;
+	public void setType(int type) {
+		switch (type)
+		{
+			case 0: this.type = Type.OBLIGATORY;
+					break;
+			case 1: this.type = Type.HEALTH;
+					break;
+			case 2: this.type = Type.SELFIMPROVEMENT;
+					break;
+			case 3: this.type = Type.RECREATIONAL;
+					break;
+			case 4: this.type = Type.CHARITY;
+					break;
+			case 5: this.type = Type.CREATIVE;
+					break;
+		}
 	}
 }

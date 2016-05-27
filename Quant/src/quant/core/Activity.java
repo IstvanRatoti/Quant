@@ -1,6 +1,7 @@
 package quant.core;
 
 
+import java.sql.Date;
 import java.util.GregorianCalendar;
 
 public class Activity extends LifeObjective {
@@ -12,13 +13,36 @@ public class Activity extends LifeObjective {
 	/* this variable is for repeated events. Default is 7 because events are usually weekly.*/
 	//private int repeated = 7;		Guess what, keep it simple!
 	
+	public Activity(String name, String description, int type, PlaceAndTime placeAndTime)
+	{
+		setName(name);
+		setDescription(description);
+		setType(type);
+		setPlaceAndTime(placeAndTime);
+	}
+	
 	/* Data structure with this class is more similar to sql database structure.
 	 * Should be easier to connect the two.
 	 */
 	public class PlaceAndTime
 	{
 		private String place;
-		private GregorianCalendar[] timeAndDate;
+		private GregorianCalendar timeAndDate;	// Temporarily not a date array, but it needs to be one!
+		
+		public PlaceAndTime(String place, Date timeAndDate)	
+		{
+			setPlace(place);
+			setTimeAndDate(timeAndDate);
+		}
+		
+		/*
+		 *  For Unscheduled activities.
+		 */
+		public PlaceAndTime(String place)
+		{
+			setPlace(place);
+			setTimeAndDate();
+		}
 		
 		public String getPlace() {
 			return place;
@@ -29,7 +53,7 @@ public class Activity extends LifeObjective {
 		}
 		
 		
-		public GregorianCalendar[] getTimeAndDate() {
+		public GregorianCalendar getTimeAndDate() {
 			return timeAndDate;
 		}
 		
@@ -37,19 +61,24 @@ public class Activity extends LifeObjective {
 		 * Modifies or creates a date and time, requires a starting date and an end date.
 		 * startDate is the array with the start dates, endDate is the end date array
 		 * TODO: testing, exception handling.
-		 */
+		 
 		public void setTimeAndDate(GregorianCalendar[] startDate, GregorianCalendar[] endDate) {
 			for(int i=0;i<startDate.length;i++) {
 				this.timeAndDate[i*2]=startDate[i];
 				this.timeAndDate[i*2+1]=endDate[i];
 			}
-		}
+		}*/
 		
 		/*
 		 * For Unscheduled activities.
 		 */
 		public void setTimeAndDate() {
 			this.timeAndDate=null;
+		}
+		
+		public void setTimeAndDate(Date timeAndDate)
+		{
+			this.timeAndDate.setTime(timeAndDate);
 		}
 	}
 
