@@ -51,18 +51,22 @@ public class Query
 	{
 		Activity activity = null;
 		ResultSet rs = this.rs;
+		int currAct = 0;	// This integer is used to determine if the result set contains places and dates for the same activity.
 		
 		try
-		{
+		{	
 			while(rs.next())
 			{
-				activity = new Activity (
-											rs.getString("actName"),
-											rs.getString("description"),
-											rs.getInt("actType"),
-											rs.getString("place"),
-											rs.getTimestamp("actDate")
-										);
+				if((currAct == 0) || (currAct != rs.getInt("actId")))
+				{
+					currAct = rs.getInt("actId");
+					activity = new Activity (	rs.getString("actName"), rs.getString("description"), rs.getInt("actType"),
+												rs.getString("place"), rs.getTimestamp("actDate"));
+				}
+				else	// If its the same activity, just add a new place and time to its object.
+				{
+					activity.addPlaceAndTime(activity.new PlaceAndTime(rs.getString("place"), rs.getTimestamp("actDate")));
+				}
 			}
 		}
 		catch (SQLException e)

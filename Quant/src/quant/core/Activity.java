@@ -2,22 +2,24 @@ package quant.core;
 
 
 import java.sql.Timestamp;
+import java.util.ArrayList;
+import java.util.List;
 
 public class Activity extends LifeObjective {
 	
-	private PlaceAndTime placeAndTime;
+	private List<PlaceAndTime> placeAndTimes;
 	//private int[] travelTime;		unnecessary yet, keep it simple
 	//private String link; don't bother with it yet	// Link with other events, TODO: clarify usage, type, etc.
 	//private GregorianCalendar dueDate;	Juuust keep it simple
 	/* this variable is for repeated events. Default is 7 because events are usually weekly.*/
 	//private int repeated = 7;		Guess what, keep it simple!
 	
-	public Activity(String name, String description, int type, PlaceAndTime placeAndTime)
+	public Activity(String name, String description, int type, List<PlaceAndTime> placeAndTime)
 	{
 		setName(name);
 		setDescription(description);
 		setType(type);
-		setPlaceAndTime(placeAndTime);
+		setPlaceAndTimes(placeAndTime);
 	}
 	
 	public Activity(String name, String description, int type, String place, Timestamp timeAndDate)
@@ -25,7 +27,8 @@ public class Activity extends LifeObjective {
 		setName(name);
 		setDescription(description);
 		setType(type);
-		this.placeAndTime = new PlaceAndTime(place, timeAndDate);
+		this.placeAndTimes = new ArrayList<PlaceAndTime>();
+		this.placeAndTimes.add(new PlaceAndTime(place, timeAndDate));
 	}
 	
 	public Activity(String name, String description, int type, String place)
@@ -33,7 +36,8 @@ public class Activity extends LifeObjective {
 		setName(name);
 		setDescription(description);
 		setType(type);
-		this.placeAndTime = new PlaceAndTime(place);
+		this.placeAndTimes = new ArrayList<PlaceAndTime>();
+		this.placeAndTimes.add(new PlaceAndTime(place));
 	}
 	
 	/* Data structure with this class is more similar to sql database structure.
@@ -97,12 +101,19 @@ public class Activity extends LifeObjective {
 		}
 	}
 
-	public PlaceAndTime getPlaceAndTime() {
-		return placeAndTime;
+	public List<PlaceAndTime> getPlaceAndTimes() {
+		return placeAndTimes;
 	}
 
-	public void setPlaceAndTime(PlaceAndTime placeAndTime) {
-		this.placeAndTime = placeAndTime;
+	public void setPlaceAndTimes(List<PlaceAndTime> placeAndTimes) {
+		this.placeAndTimes = placeAndTimes;
+	}
+	
+	public void addPlaceAndTime(PlaceAndTime placeAndtTime)
+	{
+		if(this.placeAndTimes == null)
+			this.placeAndTimes = new ArrayList<PlaceAndTime>();
+		this.placeAndTimes.add(placeAndtTime);
 	}
 
 	/*public int[] getTravelTime() {

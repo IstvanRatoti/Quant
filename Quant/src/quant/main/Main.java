@@ -16,9 +16,10 @@ public class Main
 		System.out.println(activity.getName());
 		System.out.println(activity.getDescription());
 		System.out.println(activity.getType());
-		System.out.println(activity.getPlaceAndTime().getPlace());
-		System.out.println(activity.getPlaceAndTime().getTimeAndDate().toString());
-		
+		System.out.println(activity.getPlaceAndTimes().get(0).getPlace());
+		System.out.println(activity.getPlaceAndTimes().get(0).getTimeAndDate().toString());
+		System.out.println(activity.getPlaceAndTimes().get(1).getPlace());
+		System.out.println(activity.getPlaceAndTimes().get(1).getTimeAndDate().toString());
 		
 		//TODO: Initialize/Connect to Database first
 		//TODO: Pass initial data to the App
