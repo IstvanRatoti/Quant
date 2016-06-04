@@ -19,22 +19,6 @@ public class DBConnection
 		this.setPass(pass);
 		conn = connectDB(dbUrl, user, pass);
 	}
-	
-	public Connection connectDB(String dbUrl, String user, String pass)
-	{
-		Connection conn = null;
-		
-		try
-		{
-			conn = DriverManager.getConnection(dbUrl, user, pass);
-		}
-		catch (SQLException e)
-		{
-			e.printStackTrace();
-		}
-		
-		return conn;
-	}
 
 	public String getDbUrl() {
 		return dbUrl;
@@ -60,4 +44,40 @@ public class DBConnection
 		this.user = user;
 	}
 	
+	/*
+	 * connects to the DB, returns the established connection.
+	 */
+	
+	public Connection connectDB(String dbUrl, String user, String pass)
+	{
+		Connection conn = null;
+		
+		try
+		{
+			conn = DriverManager.getConnection(dbUrl, user, pass);
+		}
+		catch (SQLException e)
+		{
+			System.err.println("Error in connecting to database, printing stack trace.");
+			e.printStackTrace();
+		}
+		
+		return conn;
+	}
+	
+	/*
+	 * closes the connection to the database
+	 */
+	public void closeConnection()
+	{
+		try
+		{
+			this.conn.close();
+		}
+		catch (SQLException e)
+		{
+			System.err.println("Error in closing connection, printing stack trace.");
+			e.printStackTrace();
+		}
+	}
 }

@@ -34,6 +34,16 @@ public class Query
 		}
 	}
 	
+	public Statement getStatement()
+	{
+		return this.stmt;
+	}
+
+	public ResultSet getResultSet()
+	{
+		return this.rs;
+	}
+	
 	/*
 	 * Gets the data from the result set, and creates a new activity object.
 	 */
@@ -46,12 +56,12 @@ public class Query
 		{
 			while(rs.next())
 			{
-				activity = new Activity (	rs.getString("actName"),
+				activity = new Activity (
+											rs.getString("actName"),
 											rs.getString("description"),
 											rs.getInt("actType"),
-											activity.new PlaceAndTime(	rs.getString("place"),
-																		rs.getDate("actDate")
-																	 )
+											rs.getString("place"),
+											rs.getTimestamp("actDate")
 										);
 			}
 		}

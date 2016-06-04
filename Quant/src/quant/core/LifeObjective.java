@@ -36,6 +36,32 @@ public abstract class LifeObjective {
 		return this.type;
 	}
 	
+	/*
+	 * returns an integer according to type. If it cannot find the type, returns -1.
+	 */
+	public int getIntType()
+	{
+		int intType = -1;
+		
+		switch (this.type)
+		{
+			case OBLIGATORY: intType = 0;
+					break;
+			case HEALTH: intType = 1;
+					break;
+			case SELFIMPROVEMENT: intType = 2;
+					break;
+			case RECREATIONAL: intType = 3;
+					break;
+			case CHARITY: intType = 4;
+					break;
+			case CREATIVE: intType = 5;
+					break;
+		}
+		
+		return intType;
+	}
+	
 	/* sets the Type value of the object */
 	public void setType(int type) {
 		switch (type)

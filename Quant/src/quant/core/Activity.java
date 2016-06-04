@@ -1,8 +1,7 @@
 package quant.core;
 
 
-import java.sql.Date;
-import java.util.GregorianCalendar;
+import java.sql.Timestamp;
 
 public class Activity extends LifeObjective {
 	
@@ -21,15 +20,31 @@ public class Activity extends LifeObjective {
 		setPlaceAndTime(placeAndTime);
 	}
 	
+	public Activity(String name, String description, int type, String place, Timestamp timeAndDate)
+	{
+		setName(name);
+		setDescription(description);
+		setType(type);
+		this.placeAndTime = new PlaceAndTime(place, timeAndDate);
+	}
+	
+	public Activity(String name, String description, int type, String place)
+	{
+		setName(name);
+		setDescription(description);
+		setType(type);
+		this.placeAndTime = new PlaceAndTime(place);
+	}
+	
 	/* Data structure with this class is more similar to sql database structure.
 	 * Should be easier to connect the two.
 	 */
 	public class PlaceAndTime
 	{
 		private String place;
-		private GregorianCalendar timeAndDate;	// Temporarily not a date array, but it needs to be one!
+		private Timestamp timeAndDate;	// Temporarily not a date array, but it needs to be one!
 		
-		public PlaceAndTime(String place, Date timeAndDate)	
+		public PlaceAndTime(String place, Timestamp timeAndDate)	
 		{
 			setPlace(place);
 			setTimeAndDate(timeAndDate);
@@ -53,7 +68,7 @@ public class Activity extends LifeObjective {
 		}
 		
 		
-		public GregorianCalendar getTimeAndDate() {
+		public Timestamp getTimeAndDate() {
 			return timeAndDate;
 		}
 		
@@ -73,12 +88,12 @@ public class Activity extends LifeObjective {
 		 * For Unscheduled activities.
 		 */
 		public void setTimeAndDate() {
-			this.timeAndDate=null;
+			this.timeAndDate = null;
 		}
 		
-		public void setTimeAndDate(Date timeAndDate)
+		public void setTimeAndDate(Timestamp timeAndDate)
 		{
-			this.timeAndDate.setTime(timeAndDate);
+			this.timeAndDate = timeAndDate;
 		}
 	}
 
