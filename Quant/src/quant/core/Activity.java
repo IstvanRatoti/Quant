@@ -5,9 +5,11 @@ import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Activity extends LifeObjective {
+public class Activity extends LifeObjective
+{
 	
 	private List<PlaceAndTime> placeAndTimes;
+	private int actId = -1;
 	//private int[] travelTime;		unnecessary yet, keep it simple
 	//private String link; don't bother with it yet	// Link with other events, TODO: clarify usage, type, etc.
 	//private GregorianCalendar dueDate;	Juuust keep it simple
@@ -40,6 +42,46 @@ public class Activity extends LifeObjective {
 		this.placeAndTimes.add(new PlaceAndTime(place));
 	}
 	
+	public Activity(String name, String description, int type, Timestamp timeAndDate)
+	{
+		setName(name);
+		setDescription(description);
+		setType(type);
+		this.placeAndTimes = new ArrayList<PlaceAndTime>();
+		this.placeAndTimes.add(new PlaceAndTime(timeAndDate));
+	}
+	
+	public Activity(String name, String description, int type)
+	{
+		setName(name);
+		setDescription(description);
+		setType(type);
+		this.placeAndTimes = null;
+	}
+	
+	/*
+	 * This constructor is for getting data from the db. We can identify each activity by the actId, and when the activity is not in the database,
+	 * its actId will be -1. We can use this later to update our database.
+	 */
+	public Activity(String name, String description, int type, String place, Timestamp timeAndDate, int actId)
+	{
+		setName(name);
+		setDescription(description);
+		setType(type);
+		setActId(actId);
+		this.placeAndTimes = new ArrayList<PlaceAndTime>();
+		this.placeAndTimes.add(new PlaceAndTime(place, timeAndDate));
+	}
+	
+	public Activity(String name, String description, int type, int actId)
+	{
+		setName(name);
+		setDescription(description);
+		setType(type);
+		setActId(actId);
+		this.placeAndTimes = null;
+	}
+	
 	/* Data structure with this class is more similar to sql database structure.
 	 * Should be easier to connect the two.
 	 */
@@ -63,6 +105,12 @@ public class Activity extends LifeObjective {
 			setTimeAndDate();
 		}
 		
+		public PlaceAndTime(Timestamp timeAndDate)
+		{
+			setPlace();
+			setTimeAndDate(timeAndDate);
+		}
+
 		public String getPlace() {
 			return place;
 		}
@@ -71,22 +119,17 @@ public class Activity extends LifeObjective {
 			this.place = place;
 		}
 		
+		/*
+		 * If no place is required.
+		 */
+		public void setPlace()
+		{
+			this.place = null;
+		}
 		
 		public Timestamp getTimeAndDate() {
 			return timeAndDate;
 		}
-		
-		/* 
-		 * Modifies or creates a date and time, requires a starting date and an end date.
-		 * startDate is the array with the start dates, endDate is the end date array
-		 * TODO: testing, exception handling.
-		 
-		public void setTimeAndDate(GregorianCalendar[] startDate, GregorianCalendar[] endDate) {
-			for(int i=0;i<startDate.length;i++) {
-				this.timeAndDate[i*2]=startDate[i];
-				this.timeAndDate[i*2+1]=endDate[i];
-			}
-		}*/
 		
 		/*
 		 * For Unscheduled activities.
@@ -116,36 +159,11 @@ public class Activity extends LifeObjective {
 		this.placeAndTimes.add(placeAndtTime);
 	}
 
-	/*public int[] getTravelTime() {
-		return travelTime;
+	public int getActId() {
+		return actId;
 	}
 
-	public void setTravelTime(int hours, int minutes) {
-		this.travelTime[0] = hours;
-		this.travelTime[1] = minutes;
+	public void setActId(int actId) {
+		this.actId = actId;
 	}
-
-	public String getLink() {
-		return link;
-	}
-
-	public void setLink(String link) {
-		this.link = link;
-	}*/
-	
-	/*public int getRepeated() {
-		return repeated;
-	}
-
-	public void setRepeated(int repeats) {
-		this.repeated = repeats;
-	}
-
-	public GregorianCalendar getDueDate() {
-		return dueDate;
-	}
-
-	public void setDueDate(GregorianCalendar dueDate) {
-		this.dueDate = dueDate;
-	}*/
 }

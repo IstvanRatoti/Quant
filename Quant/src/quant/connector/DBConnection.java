@@ -12,7 +12,7 @@ public class DBConnection
 	private String user;
 	private String pass;
 	
-	public DBConnection(String dbUrl, String user, String pass)
+	public DBConnection(String dbUrl, String user, String pass) throws SQLException
 	{
 		this.setDbUrl(dbUrl);
 		this.setUser(user);
@@ -45,39 +45,21 @@ public class DBConnection
 	}
 	
 	/*
-	 * connects to the DB, returns the established connection.
+	 * Connects to the DB, returns the established connection.
 	 */
 	
-	public Connection connectDB(String dbUrl, String user, String pass)
+	public Connection connectDB(String dbUrl, String user, String pass) throws SQLException
 	{
-		Connection conn = null;
-		
-		try
-		{
-			conn = DriverManager.getConnection(dbUrl, user, pass);
-		}
-		catch (SQLException e)
-		{
-			System.err.println("Error in connecting to database, printing stack trace.");
-			e.printStackTrace();
-		}
+		Connection conn = DriverManager.getConnection(dbUrl, user, pass);
 		
 		return conn;
 	}
 	
 	/*
-	 * closes the connection to the database
+	 * Closes the connection to the database.
 	 */
-	public void closeConnection()
+	public void closeConnection() throws SQLException
 	{
-		try
-		{
-			this.conn.close();
-		}
-		catch (SQLException e)
-		{
-			System.err.println("Error in closing connection, printing stack trace.");
-			e.printStackTrace();
-		}
+		this.conn.close();
 	}
 }
