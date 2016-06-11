@@ -1,6 +1,7 @@
 package quant.main;
 
 import java.sql.SQLException;
+import java.sql.Time;
 import java.sql.Timestamp;
 import java.util.List;
 
@@ -63,8 +64,10 @@ public class Main
 		
 		// Add some stuff to the database.
 		Timestamp date = new Timestamp(0);
-		Activity actToStore = new Activity("inserted activity", "this one is from the java code", 0, "candyland", date);
-		actToStore.addPlaceAndTime(actToStore.new PlaceAndTime("neverland", date));
+		Time duration = new Time(0);
+		Time duration2 = new Time(1000);
+		Activity actToStore = new Activity("inserted activity", "this one is from the java code", 0, "candyland", date, duration);
+		actToStore.addPlaceAndTime(actToStore.new PlaceAndTime("neverland", date, duration2), false);
 		
 		try
 		{

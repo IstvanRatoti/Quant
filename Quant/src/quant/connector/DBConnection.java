@@ -17,7 +17,7 @@ public class DBConnection
 		this.setDbUrl(dbUrl);
 		this.setUser(user);
 		this.setPass(pass);
-		conn = connectDB(dbUrl, user, pass);
+		this.conn = connectDB(dbUrl, user, pass);
 	}
 
 	public String getDbUrl() {

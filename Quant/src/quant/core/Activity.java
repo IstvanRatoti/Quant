@@ -1,6 +1,7 @@
 package quant.core;
 
 
+import java.sql.Time;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
@@ -10,45 +11,34 @@ public class Activity extends LifeObjective
 	
 	private List<PlaceAndTime> placeAndTimes;
 	private int actId = -1;
-	//private int[] travelTime;		unnecessary yet, keep it simple
-	//private String link; don't bother with it yet	// Link with other events, TODO: clarify usage, type, etc.
-	//private GregorianCalendar dueDate;	Juuust keep it simple
-	/* this variable is for repeated events. Default is 7 because events are usually weekly.*/
-	//private int repeated = 7;		Guess what, keep it simple!
 	
-	public Activity(String name, String description, int type, List<PlaceAndTime> placeAndTime)
+	/*
+	 * These constructors are for creating the object in the app. The actId (should) default to -1, that's how we know its not in the database.
+	 */
+	public Activity(String name, String description, int type, List<PlaceAndTime> placeAndTimes)
 	{
 		setName(name);
 		setDescription(description);
 		setType(type);
-		setPlaceAndTimes(placeAndTime);
+		setPlaceAndTimes(placeAndTimes);
 	}
 	
-	public Activity(String name, String description, int type, String place, Timestamp timeAndDate)
+	public Activity(String name, String description, int type, PlaceAndTime placeAndTime)
 	{
 		setName(name);
 		setDescription(description);
 		setType(type);
 		this.placeAndTimes = new ArrayList<PlaceAndTime>();
-		this.placeAndTimes.add(new PlaceAndTime(place, timeAndDate));
+		this.placeAndTimes.add(placeAndTime);
 	}
 	
-	public Activity(String name, String description, int type, String place)
+	public Activity(String name, String description, int type, String place, Timestamp timeAndDate, Time duration)
 	{
 		setName(name);
 		setDescription(description);
 		setType(type);
 		this.placeAndTimes = new ArrayList<PlaceAndTime>();
-		this.placeAndTimes.add(new PlaceAndTime(place));
-	}
-	
-	public Activity(String name, String description, int type, Timestamp timeAndDate)
-	{
-		setName(name);
-		setDescription(description);
-		setType(type);
-		this.placeAndTimes = new ArrayList<PlaceAndTime>();
-		this.placeAndTimes.add(new PlaceAndTime(timeAndDate));
+		this.placeAndTimes.add(new PlaceAndTime(place, timeAndDate, duration));
 	}
 	
 	public Activity(String name, String description, int type)
@@ -60,17 +50,17 @@ public class Activity extends LifeObjective
 	}
 	
 	/*
-	 * This constructor is for getting data from the db. We can identify each activity by the actId, and when the activity is not in the database,
+	 * These constructor are for getting data from the db. We can identify each activity by the actId, and when the activity is not in the database,
 	 * its actId will be -1. We can use this later to update our database.
 	 */
-	public Activity(String name, String description, int type, String place, Timestamp timeAndDate, int actId)
+	public Activity(String name, String description, int type, String place, Timestamp timeAndDate, Time duration, int actId)
 	{
 		setName(name);
 		setDescription(description);
 		setType(type);
 		setActId(actId);
 		this.placeAndTimes = new ArrayList<PlaceAndTime>();
-		this.placeAndTimes.add(new PlaceAndTime(place, timeAndDate));
+		this.placeAndTimes.add(new PlaceAndTime(place, timeAndDate, duration));
 	}
 	
 	public Activity(String name, String description, int type, int actId)
@@ -82,33 +72,21 @@ public class Activity extends LifeObjective
 		this.placeAndTimes = null;
 	}
 	
-	/* Data structure with this class is more similar to sql database structure.
+	/* 
+	 * Data structure with this class is more similar to sql database structure.
 	 * Should be easier to connect the two.
 	 */
 	public class PlaceAndTime
 	{
 		private String place;
-		private Timestamp timeAndDate;	// Temporarily not a date array, but it needs to be one!
+		private Timestamp timeAndDate;
+		private Time duration;
 		
-		public PlaceAndTime(String place, Timestamp timeAndDate)	
+		public PlaceAndTime(String place, Timestamp timeAndDate, Time duration)	
 		{
 			setPlace(place);
 			setTimeAndDate(timeAndDate);
-		}
-		
-		/*
-		 *  For Unscheduled activities.
-		 */
-		public PlaceAndTime(String place)
-		{
-			setPlace(place);
-			setTimeAndDate();
-		}
-		
-		public PlaceAndTime(Timestamp timeAndDate)
-		{
-			setPlace();
-			setTimeAndDate(timeAndDate);
+			setDuration(duration);
 		}
 
 		public String getPlace() {
@@ -119,28 +97,57 @@ public class Activity extends LifeObjective
 			this.place = place;
 		}
 		
-		/*
-		 * If no place is required.
-		 */
-		public void setPlace()
-		{
-			this.place = null;
-		}
-		
 		public Timestamp getTimeAndDate() {
 			return timeAndDate;
-		}
-		
-		/*
-		 * For Unscheduled activities.
-		 */
-		public void setTimeAndDate() {
-			this.timeAndDate = null;
 		}
 		
 		public void setTimeAndDate(Timestamp timeAndDate)
 		{
 			this.timeAndDate = timeAndDate;
+		}
+
+		public Time getDuration() {
+			return duration;
+		}
+
+		public void setDuration(Time duration) {
+			this.duration = duration;
+		}
+
+		public String getDurationString()
+		{
+			String returnString = "";
+			
+			if(this.duration == null)
+				returnString = "NULL";
+			else
+				returnString = "\'" + this.duration.toString() + "\'";
+			
+			return returnString;
+		}
+
+		public String getPlaceString()
+		{
+			String returnString = "";
+			
+			if(this.place == null)
+				returnString = "NULL";
+			else
+				returnString = "\'" + this.place + "\'";
+			
+			return returnString;
+		}
+
+		public String getTimeAndDateString()
+		{
+			String returnString = "";
+			
+			if(this.timeAndDate == null)
+				returnString = "NULL";
+			else
+				returnString = "\'" + this.timeAndDate.toString() + "\'";
+			
+			return returnString;
 		}
 	}
 
@@ -152,11 +159,19 @@ public class Activity extends LifeObjective
 		this.placeAndTimes = placeAndTimes;
 	}
 	
-	public void addPlaceAndTime(PlaceAndTime placeAndtTime)
+	/*
+	 * Use this only to add a new PlaceAndTime object to an existing Activity object. If adding a new date to a free activity,
+	 *  this method will optionally add a record with no date or time, "keeping" the free portion of the activity too.
+	 */
+	public void addPlaceAndTime(PlaceAndTime placeAndTime, boolean isReplacing)
 	{
 		if(this.placeAndTimes == null)
+		{
 			this.placeAndTimes = new ArrayList<PlaceAndTime>();
-		this.placeAndTimes.add(placeAndtTime);
+			if(!isReplacing)
+				this.placeAndTimes.add(new PlaceAndTime(null, null, null));
+		}
+		this.placeAndTimes.add(placeAndTime);
 	}
 
 	public int getActId() {

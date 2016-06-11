@@ -53,20 +53,19 @@ public class Query
 			{
 				i++;
 				currAct = rs.getInt("actId");
-				//System.out.println(currAct);
-				if (currAct != 0)
+				if (currAct != 0)	// For Scheduled activities.
 				{
 					actList.add(new Activity (	rs.getString("actName"), rs.getString("description"), rs.getInt("actType"),
-												rs.getString("place"), rs.getTimestamp("actDate"), rs.getInt("activities.id")));
+												rs.getString("place"), rs.getTimestamp("actDate"), rs.getTime("duration"), rs.getInt("activities.id")));
 				}
-				else
+				else				// For Unscheduled activities.
 				{
 					actList.add(new Activity (rs.getString("actName"), rs.getString("description"), rs.getInt("actType"), rs.getInt("activities.id")));
 				}
 			}
 			else	// If its the same activity, just add a new place and time to its object.
 			{
-				actList.get(i).addPlaceAndTime(actList.get(i).new PlaceAndTime(rs.getString("place"), rs.getTimestamp("actDate")));
+				actList.get(i).addPlaceAndTime(actList.get(i).new PlaceAndTime(rs.getString("place"), rs.getTimestamp("actDate"), rs.getTime("duration")), false);
 			}
 		}
 		
@@ -75,9 +74,13 @@ public class Query
 	
 	/*
 	 * This function stores data from an activity object in the database. It is static because it creates the queries it needs.
+	 * Returns true if the data did not exist in the database, false if it did. It only stores data if it was not already in the database.
 	 */
-	public static void storeData(Activity activity, DBConnection dBConnection) throws SQLException
+	public static boolean storeData(Activity activity, DBConnection dBConnection) throws SQLException
 	{
+		if(activity.getActId() != -1)
+			return false;
+		
 		Query actInsertQuery;	// First query. Need two because the first will insert the id we need to supply the third with.
 		Query actIdQuery;		// This query will get us the id we need for the third one.
 		
@@ -97,10 +100,11 @@ public class Query
 		
 		for(Activity.PlaceAndTime placeAndTime : activity.getPlaceAndTimes())
 		{
-			String sqlTimeInsert =	"INSERT INTO timetable(actId, actDate, place) VALUES ("
-																							+ actId + ", \'"	//This will (hopefully) insert the correct actId.
-																							+ placeAndTime.getTimeAndDate().toString() + "\', \'"
-																							+ placeAndTime.getPlace()  + "\'"
+			String sqlTimeInsert =	"INSERT INTO timetable(actId, actDate, place, duration) VALUES ("
+																							+ actId + ", "	//This will (hopefully) insert the correct actId.
+																							+ placeAndTime.getTimeAndDateString() + ", "
+																							+ placeAndTime.getPlaceString()  + ", "
+																							+ placeAndTime.getDurationString()
 									+ ");";
 			
 			Query timeInsertQuery = new Query(dBConnection, sqlTimeInsert, true);
@@ -108,22 +112,36 @@ public class Query
 		}
 		
 		actIdQuery.closeQuery();
+		
+		return true;
 	}
 	
 	/*
-	 * List variation of the storeData function.
+	 * List variation of the storeData function. Returns the list of activities NOT added for some reason.
 	 */
-	public static void storeData(List<Activity> actList, DBConnection dBConnection) throws SQLException
+	public static List<Activity> storeData(List<Activity> actList, DBConnection dBConnection) throws SQLException
 	{
+		List<Activity> actNotStoredList = new ArrayList<Activity>();
+		
 		for(Activity activity : actList)
-			storeData(activity, dBConnection);
+		{
+			if(!storeData(activity, dBConnection))
+				actNotStoredList.add(activity);
+		}
+		
+		return actNotStoredList;
 	}
 	
 	/*
 	 * Deletes the activity from the sql database. WARNING! Will NOT delete(if java could...) the object.
+	 * Returns true if the activity was in the database, false if it was not. It will only try to delete the object
+	 * if it was in the database.
 	 */
 	public static void deleteData(Activity activity, DBConnection dBConnection) throws SQLException
 	{
+		if(activity.getActId() == -1)
+			return;
+		
 		String sql =	"DELETE activities, timetable FROM activities LEFT JOIN timetable ON activities.id=timetable.actId WHERE activities.id=\'"
 						+ activity.getActId() + "\';";
 		Query deleteQuery = new Query(dBConnection, sql, true);
@@ -131,7 +149,7 @@ public class Query
 	}
 	
 	/*
-	 * List variation of the deleteData function
+	 * List variation of the deleteData function.
 	 */
 	public static void deleteData(List<Activity> actList, DBConnection dBConnection) throws SQLException
 	{
