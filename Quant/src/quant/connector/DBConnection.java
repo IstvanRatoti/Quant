@@ -7,7 +7,7 @@ import java.sql.*;
  */
 public class DBConnection
 {
-	public Connection conn;
+	public Connection conn;		// This should not be static, so we can have more db connections at the same time.
 	private String dbUrl;
 	private String user;
 	private String pass;
@@ -60,6 +60,6 @@ public class DBConnection
 	 */
 	public void closeConnection() throws SQLException
 	{
-		this.conn.close();
+		conn.close();
 	}
 }

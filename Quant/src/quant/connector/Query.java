@@ -103,8 +103,8 @@ public class Query
 		
 		for(Activity.PlaceAndTime placeAndTime : activity.getPlaceAndTimes())
 		{
-			String sqlTimeInsert =	"INSERT INTO timetable(actId, actDate, place, duration, scheduleId) VALUES ("
-																							+ actId + ", "	//This will (hopefully) insert the correct actId.
+			String sqlTimeInsert =	"INSERT INTO timetable(actId, actDate, place, duration) VALUES ("
+																							+ actId + ", "	//This will insert the correct actId.
 																							+ placeAndTime.getTimeAndDateString() + ", "
 																							+ placeAndTime.getPlaceString()  + ", "
 																							+ placeAndTime.getDurationString()  + ", "
