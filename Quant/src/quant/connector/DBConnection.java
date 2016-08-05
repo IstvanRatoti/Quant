@@ -7,7 +7,7 @@ import java.sql.*;
  */
 public class DBConnection
 {
-	protected Connection conn;
+	public Connection conn;
 	private String dbUrl;
 	private String user;
 	private String pass;

@@ -14,7 +14,7 @@ public class Query
 	/*
 	 * Queries the server with given sql statement.
 	 */
-	public Query(DBConnection dBConnection, String sql, boolean manipulation) throws SQLException
+	public Query(String sql, DBConnection dBConnection, boolean manipulation) throws SQLException
 	{
 		this.stmt = dBConnection.conn.createStatement();
 		
@@ -90,10 +90,10 @@ public class Query
 																								+ activity.getDescription() + "\'"
 								+ ");";
 		
-		actInsertQuery = new Query(dBConnection, sqlActInsert, true);
+		actInsertQuery = new Query(sqlActInsert, dBConnection, true);
 		actInsertQuery.closeQuery();
 		
-		actIdQuery = new Query(dBConnection, "SELECT id FROM activities WHERE actName=\'" + activity.getName() + "\';", false);
+		actIdQuery = new Query("SELECT id FROM activities WHERE actName=\'" + activity.getName() + "\';", dBConnection, false);
 		actIdQuery.rs.next();
 		int actId = actIdQuery.rs.getInt("id");
 		activity.setActId(actId);
@@ -107,7 +107,7 @@ public class Query
 																							+ placeAndTime.getDurationString()
 									+ ");";
 			
-			Query timeInsertQuery = new Query(dBConnection, sqlTimeInsert, true);
+			Query timeInsertQuery = new Query(sqlTimeInsert, dBConnection, true);
 			timeInsertQuery.closeQuery();
 		}
 		
@@ -144,7 +144,7 @@ public class Query
 		
 		String sql =	"DELETE activities, timetable FROM activities LEFT JOIN timetable ON activities.id=timetable.actId WHERE activities.id=\'"
 						+ activity.getActId() + "\';";
-		Query deleteQuery = new Query(dBConnection, sql, true);
+		Query deleteQuery = new Query(sql, dBConnection, true);
 		deleteQuery.closeQuery();
 	}
 	

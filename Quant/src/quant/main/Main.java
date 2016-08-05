@@ -17,7 +17,7 @@ public class Main
 	 */
 	public static void printStuff(DBConnection dBConnection) throws SQLException
 	{
-		Query query = new Query(dBConnection, "SELECT * FROM activities LEFT JOIN timetable ON activities.id = timetable.actId", false);
+		Query query = new Query("SELECT * FROM activities LEFT JOIN timetable ON activities.id = timetable.actId", dBConnection, false);
 		List<Activity> actList = query.getData();
 		
 		for(Activity activity : actList)
