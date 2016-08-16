@@ -78,8 +78,10 @@ public class Query
 	 */
 	public static boolean storeData(Activity activity, DBConnection dBConnection) throws SQLException
 	{
+		boolean notExists = true;
+		
 		if(activity.getActId() != -1)
-			return false;
+			notExists = false;
 		
 		Query actInsertQuery;	// First query. Need two because the first will insert the id we need to supply the third with.
 		Query actIdQuery;		// This query will get us the id we need for the third one.
@@ -113,23 +115,16 @@ public class Query
 		
 		actIdQuery.closeQuery();
 		
-		return true;
+		return notExists;
 	}
 	
 	/*
 	 * List variation of the storeData function. Returns the list of activities NOT added for some reason.
 	 */
-	public static List<Activity> storeData(List<Activity> actList, DBConnection dBConnection) throws SQLException
-	{
-		List<Activity> actNotStoredList = new ArrayList<Activity>();
-		
+	public static void storeData(List<Activity> actList, DBConnection dBConnection) throws SQLException
+	{	
 		for(Activity activity : actList)
-		{
-			if(!storeData(activity, dBConnection))
-				actNotStoredList.add(activity);
-		}
-		
-		return actNotStoredList;
+			storeData(activity, dBConnection);
 	}
 	
 	/*
