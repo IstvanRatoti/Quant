@@ -12,6 +12,7 @@ import javafx.scene.control.ScrollPane.ScrollBarPolicy;
 import javafx.scene.layout.*;
 import javafx.stage.Stage;
 import javafx.util.Pair;
+import quant.connector.Query;
 import quant.core.Activity;
 import quant.main.Main;
 
@@ -105,10 +106,23 @@ public class MainWindowCont
 		actName.setAlignment(Pos.BASELINE_LEFT);
 		actName.textProperty().bind(actPair.getKey());	//Binding, so we can modify it from outside.
 		
-		Button actRemoveBtn = new Button("Remove");		// Dummy button.
+		Button actRemoveBtn = new Button("Remove");		// Button to remove the activity.
 		HBox.setMargin(actRemoveBtn, new Insets(5, 5, 5, 5));
 		actRemoveBtn.setAlignment(Pos.BASELINE_LEFT);
-		actRemoveBtn.setOnAction(e -> actList.getChildren().remove(actBox));	// Simple remove Button.
+		actRemoveBtn.setOnAction(e -> 	{
+											actList.getChildren().remove(actBox);
+											
+											// This function should remove the activity from the appData too. But, we can't access it anyhow...interesting dilemma.
+											
+											try
+											{	// Removes the activity from the database.
+												Query.deleteData(act, Main.connection);
+											} 
+											catch (Exception e1)
+											{
+												e1.printStackTrace();
+											}
+										});
 		
 		actBox.getChildren().addAll(actDetailsBtn, actName,actRemoveBtn);
 		

@@ -4,6 +4,7 @@ import java.sql.Time;
 import java.sql.Timestamp;
 
 import javafx.beans.property.SimpleStringProperty;
+import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
@@ -14,6 +15,8 @@ import javafx.scene.control.TextField;
 import javafx.scene.layout.AnchorPane;
 import javafx.stage.Stage;
 import javafx.util.Pair;
+
+import quant.connector.Query;
 import quant.core.Activity;
 import quant.main.Main;
 
@@ -45,52 +48,89 @@ public class DetailsWindowCont
 		this.type.setItems(FXCollections.observableArrayList("Obligatory", "Health", "Self-Improvement", "Recreational", "Charity", "Creative"));
 		
 		acceptBtn.setOnAction(e -> {	// Saves the data and closes the window.
+										Activity actToStore = null;
+										
 										if(actId == -2)	// Creates a new activity and saves it.
 										{
-											Activity newAct = new Activity	(
-																				name.getText(), 
-																				desc.getText(), 
-																				this.intType, 
-																				place.getText(), 
-																				Timestamp.valueOf(date.getValue().atStartOfDay()), 
-																				new Time(0)
-																			);
-											Pair<SimpleStringProperty, Activity> newPair = new Pair<SimpleStringProperty, Activity>(new SimpleStringProperty(newAct.getName()), newAct);
+											actToStore = new Activity 	(
+																			name.getText(), 
+																			desc.getText(), 
+																			this.intType, 
+																			place.getText(), 
+																			Timestamp.valueOf(date.getValue().atStartOfDay()), 
+																			new Time(0)
+																		);
+											Pair<SimpleStringProperty, Activity> newPair = new Pair<SimpleStringProperty, Activity>(new SimpleStringProperty(actToStore.getName()), actToStore);
 											Main.appData.add(newPair);
 											
 											((MainWindowCont) ap.getScene().getUserData()).addActBox(newPair);
-											Stage stage = (Stage) ap.getScene().getWindow();
-											stage.close();
 										}
 										else	// Updates an existing activity.
 										{
 											for(Pair<SimpleStringProperty, Activity> actPair : Main.appData)
 											{
-												Activity act = actPair.getValue();
+												actToStore = actPair.getValue();
 												
-												if(actId == act.getActId())
+												if(actId == actToStore.getActId())
 												{
 													actPair.getKey().set(name.getText());
 													
-													act.setName(name.getText());
-													act.setDescription(desc.getText());
-													act.setType(this.intType);
-													act.getPlaceAndTimes().get(0).setDuration(new Time(0));
-													act.getPlaceAndTimes().get(0).setPlace(place.getText());
-													act.getPlaceAndTimes().get(0).setTimeAndDate(Timestamp.valueOf(date.getValue().atStartOfDay()));
+													actToStore.setName(name.getText());
+													actToStore.setDescription(desc.getText());
+													actToStore.setType(this.intType);
+													actToStore.getPlaceAndTimes().get(0).setDuration(new Time(0));
+													actToStore.getPlaceAndTimes().get(0).setPlace(place.getText());
+													actToStore.getPlaceAndTimes().get(0).setTimeAndDate(Timestamp.valueOf(date.getValue().atStartOfDay()));
 													break;
 												}
 											}
-
-											Stage stage = (Stage) ap.getScene().getWindow();
-											stage.close();
 										}
-									});
-		
-		cancelBtn.setOnAction(e -> {	// Closes the window, doesn't save anything.
+										
+										try
+										{
+											Query.deleteData(actToStore, Main.connection);
+											Query.storeData(actToStore, Main.connection);
+										} 
+										catch (Exception e1)
+										{
+											e1.printStackTrace();
+										}
+										
 										Stage stage = (Stage) ap.getScene().getWindow();
 										stage.close();
 									});
+		
+		cancelBtn.setOnAction(e -> {	// Closes the window, doesn't save anything.
+			
+										
+										Stage stage = (Stage) ap.getScene().getWindow();
+										stage.close();
+									});
+		
+		type.getSelectionModel().selectedItemProperty().addListener(		// Listens for changes in the ChoiceBox, and sets intType accordingly.
+				(ObservableValue<? extends String> observable, String oldValue, String newValue) -> {
+																										switch(newValue)
+																										{
+																											case "Obligatory":
+																												this.intType = 0;
+																												break;
+																											case "Health":
+																												this.intType = 1;
+																												break;
+																											case "Self-Improvement":
+																												this.intType = 2;
+																												break;
+																											case "Recreational":
+																												this.intType = 3;
+																												break;
+																											case "Charity":
+																												this.intType = 4;
+																												break;
+																											case "Creative":
+																												this.intType = 5;
+																												break;
+																										}
+																									});
 	}
 	
 	// Used to edit existing activities. Sets the data.

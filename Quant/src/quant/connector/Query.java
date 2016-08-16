@@ -75,7 +75,7 @@ public class Query
 	
 	/*
 	 * This function stores data from an activity object in the database. It is static because it creates the queries it needs.
-	 * Returns true if the data did not exist in the database, false if it did. It only stores data if it was not already in the database.
+	 * Returns true if the data did not exist in the database, false if it did.
 	 */
 	public static boolean storeData(Activity activity, DBConnection dBConnection) throws SQLException
 	{
@@ -85,7 +85,6 @@ public class Query
 			notExists = false;
 		
 		Query actInsertQuery;	// First query. Need two because the first will insert the id we need to supply the third with.
-		Query actIdQuery;		// This query will get us the id we need for the third one.
 		
 		String sqlActInsert =	"INSERT INTO activities(actName, actType, description) VALUES (\'"
 																								+ activity.getName() + "\', "
@@ -96,32 +95,41 @@ public class Query
 		actInsertQuery = new Query(sqlActInsert, dBConnection, true);
 		actInsertQuery.closeQuery();
 		
-		actIdQuery = new Query("SELECT id FROM activities WHERE actName=\'" + activity.getName() + "\';", dBConnection, false);
-		actIdQuery.rs.next();
-		int actId = actIdQuery.rs.getInt("id");
-		activity.setActId(actId);
-		
-		for(Activity.PlaceAndTime placeAndTime : activity.getPlaceAndTimes())
+		if(activity.getPlaceAndTimes() == null)
 		{
-			String sqlTimeInsert =	"INSERT INTO timetable(actId, actDate, place, duration) VALUES ("
-																							+ actId + ", "	//This will insert the correct actId.
-																							+ placeAndTime.getTimeAndDateString() + ", "
-																							+ placeAndTime.getPlaceString()  + ", "
-																							+ placeAndTime.getDurationString()  + ", "
-																							+ placeAndTime.getScheduleId()
-									+ ");";
-			
-			Query timeInsertQuery = new Query(sqlTimeInsert, dBConnection, true);
-			timeInsertQuery.closeQuery();
+			return notExists;
 		}
+		else
+		{
+			Query actIdQuery;		// This query will get us the id we need for the third one.
+
+			actIdQuery = new Query("SELECT id FROM activities WHERE actName=\'" + activity.getName() + "\';", dBConnection, false);
+			actIdQuery.rs.next();
+			int actId = actIdQuery.rs.getInt("id");
+			activity.setActId(actId);
+			
+			for(Activity.PlaceAndTime placeAndTime : activity.getPlaceAndTimes())
+			{
+				String sqlTimeInsert =	"INSERT INTO timetable(actId, actDate, place, duration) VALUES ("
+																								+ actId + ", "	//This will insert the correct actId.
+																								+ placeAndTime.getTimeAndDateString() + ", "
+																								+ placeAndTime.getPlaceString()  + ", "
+																								+ placeAndTime.getDurationString() + ", "
+																								+ placeAndTime.getScheduleId()
+																								+ ");";
+
+				Query timeInsertQuery = new Query(sqlTimeInsert, dBConnection, true);
+				timeInsertQuery.closeQuery();
+			}
 		
-		actIdQuery.closeQuery();
+			actIdQuery.closeQuery();
+		}
 		
 		return notExists;
 	}
 	
 	/*
-	 * List variation of the storeData function. Returns the list of activities NOT added for some reason.
+	 * List variation of the storeData function.
 	 */
 	public static void storeData(List<Activity> actList, DBConnection dBConnection) throws SQLException
 	{	
