@@ -32,13 +32,13 @@ public class Activity extends LifeObjective
 		this.placeAndTimes.add(placeAndTime);
 	}
 	
-	public Activity(String name, String description, int type, String place, Timestamp timeAndDate, Time duration)
+	public Activity(String name, String description, int type, String place, Timestamp timeAndDate, Time duration, byte scheduleId)
 	{
 		setName(name);
 		setDescription(description);
 		setType(type);
 		this.placeAndTimes = new ArrayList<PlaceAndTime>();
-		this.placeAndTimes.add(new PlaceAndTime(place, timeAndDate, duration));
+		this.placeAndTimes.add(new PlaceAndTime(place, timeAndDate, duration, scheduleId));
 	}
 	
 	public Activity(String name, String description, int type)
@@ -53,14 +53,14 @@ public class Activity extends LifeObjective
 	 * These constructor are for getting data from the db. We can identify each activity by the actId, and when the activity is not in the database,
 	 * its actId will be -1. We can use this later to update our database.
 	 */
-	public Activity(String name, String description, int type, String place, Timestamp timeAndDate, Time duration, int actId)
+	public Activity(String name, String description, int type, String place, Timestamp timeAndDate, Time duration, int actId, byte scheduleId)
 	{
 		setName(name);
 		setDescription(description);
 		setType(type);
 		setActId(actId);
 		this.placeAndTimes = new ArrayList<PlaceAndTime>();
-		this.placeAndTimes.add(new PlaceAndTime(place, timeAndDate, duration));
+		this.placeAndTimes.add(new PlaceAndTime(place, timeAndDate, duration, scheduleId));
 	}
 	
 	public Activity(String name, String description, int type, int actId)
@@ -81,12 +81,14 @@ public class Activity extends LifeObjective
 		private String place;
 		private Timestamp timeAndDate;
 		private Time duration;
+		private byte scheduleId;
 		
-		public PlaceAndTime(String place, Timestamp timeAndDate, Time duration)	
+		public PlaceAndTime(String place, Timestamp timeAndDate, Time duration, byte scheduleId)	
 		{
 			setPlace(place);
 			setTimeAndDate(timeAndDate);
 			setDuration(duration);
+			setScheduleId(scheduleId);
 		}
 
 		public String getPlace() {
@@ -149,6 +151,16 @@ public class Activity extends LifeObjective
 			
 			return returnString;
 		}
+
+		public byte getScheduleId()
+		{
+			return scheduleId;
+		}
+
+		public void setScheduleId(byte scheduleId)
+		{
+			this.scheduleId = scheduleId;
+		}
 	}
 
 	public List<PlaceAndTime> getPlaceAndTimes() {
@@ -169,7 +181,7 @@ public class Activity extends LifeObjective
 		{
 			this.placeAndTimes = new ArrayList<PlaceAndTime>();
 			if(!isReplacing)
-				this.placeAndTimes.add(new PlaceAndTime(null, null, null));
+				this.placeAndTimes.add(new PlaceAndTime(null, null, null, (byte) 0));
 		}
 		this.placeAndTimes.add(placeAndTime);
 	}

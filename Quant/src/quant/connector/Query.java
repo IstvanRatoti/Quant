@@ -56,7 +56,8 @@ public class Query
 				if (currAct != 0)	// For Scheduled activities.
 				{
 					actList.add(new Activity (	rs.getString("actName"), rs.getString("description"), rs.getInt("actType"),
-												rs.getString("place"), rs.getTimestamp("actDate"), rs.getTime("duration"), rs.getInt("activities.id")));
+												rs.getString("place"), rs.getTimestamp("actDate"), rs.getTime("duration"),
+												rs.getInt("activities.id"), rs.getByte("scheduleId")));
 				}
 				else				// For Unscheduled activities.
 				{
@@ -65,7 +66,7 @@ public class Query
 			}
 			else	// If its the same activity, just add a new place and time to its object.
 			{
-				actList.get(i).addPlaceAndTime(actList.get(i).new PlaceAndTime(rs.getString("place"), rs.getTimestamp("actDate"), rs.getTime("duration")), false);
+				actList.get(i).addPlaceAndTime(actList.get(i).new PlaceAndTime(rs.getString("place"), rs.getTimestamp("actDate"), rs.getTime("duration"), rs.getByte("scheduleId")), false);
 			}
 		}
 		
@@ -102,11 +103,12 @@ public class Query
 		
 		for(Activity.PlaceAndTime placeAndTime : activity.getPlaceAndTimes())
 		{
-			String sqlTimeInsert =	"INSERT INTO timetable(actId, actDate, place, duration) VALUES ("
+			String sqlTimeInsert =	"INSERT INTO timetable(actId, actDate, place, duration, scheduleId) VALUES ("
 																							+ actId + ", "	//This will (hopefully) insert the correct actId.
 																							+ placeAndTime.getTimeAndDateString() + ", "
 																							+ placeAndTime.getPlaceString()  + ", "
-																							+ placeAndTime.getDurationString()
+																							+ placeAndTime.getDurationString()  + ", "
+																							+ placeAndTime.getScheduleId()
 									+ ");";
 			
 			Query timeInsertQuery = new Query(sqlTimeInsert, dBConnection, true);
