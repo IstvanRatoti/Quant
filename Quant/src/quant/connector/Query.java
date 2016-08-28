@@ -57,7 +57,7 @@ public class Query
 				{
 					actList.add(new Activity (	rs.getString("actName"), rs.getString("description"), rs.getInt("actType"),
 												rs.getString("place"), rs.getTimestamp("actDate"), rs.getTime("duration"),
-												rs.getInt("activities.id"), rs.getByte("scheduleId")));
+												rs.getInt("activities.id"), rs.getInt("scheduleId")));
 				}
 				else				// For Unscheduled activities.
 				{
@@ -66,7 +66,7 @@ public class Query
 			}
 			else	// If its the same activity, just add a new place and time to its object.
 			{
-				actList.get(i).addPlaceAndTime(actList.get(i).new PlaceAndTime(rs.getString("place"), rs.getTimestamp("actDate"), rs.getTime("duration"), rs.getByte("scheduleId")), false);
+				actList.get(i).addPlaceAndTime(actList.get(i).new PlaceAndTime(rs.getString("place"), rs.getTimestamp("actDate"), rs.getTime("duration"), rs.getInt("scheduleId")), false);
 			}
 		}
 		
@@ -93,7 +93,6 @@ public class Query
 								+ ");";
 		
 		actInsertQuery = new Query(sqlActInsert, dBConnection, true);
-		actInsertQuery.closeQuery();
 		
 		if(activity.getPlaceAndTimes() == null)
 		{
@@ -102,15 +101,15 @@ public class Query
 		else
 		{
 			Query actIdQuery;		// This query will get us the id we need for the third one.
-
 			actIdQuery = new Query("SELECT id FROM activities WHERE actName=\'" + activity.getName() + "\';", dBConnection, false);
 			actIdQuery.rs.next();
 			int actId = actIdQuery.rs.getInt("id");
 			activity.setActId(actId);
+			actIdQuery.closeQuery();
 			
 			for(Activity.PlaceAndTime placeAndTime : activity.getPlaceAndTimes())
 			{
-				String sqlTimeInsert =	"INSERT INTO timetable(actId, actDate, place, duration) VALUES ("
+				String sqlTimeInsert =	"INSERT INTO timetable(actId, actDate, place, duration, scheduleId) VALUES ("
 																								+ actId + ", "	//This will insert the correct actId.
 																								+ placeAndTime.getTimeAndDateString() + ", "
 																								+ placeAndTime.getPlaceString()  + ", "
@@ -122,7 +121,7 @@ public class Query
 				timeInsertQuery.closeQuery();
 			}
 		
-			actIdQuery.closeQuery();
+			actInsertQuery.closeQuery();
 		}
 		
 		return notExists;

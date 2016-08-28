@@ -32,7 +32,7 @@ public class Activity extends LifeObjective
 		this.placeAndTimes.add(placeAndTime);
 	}
 	
-	public Activity(String name, String description, int type, String place, Timestamp timeAndDate, Time duration, byte scheduleId)
+	public Activity(String name, String description, int type, String place, Timestamp timeAndDate, Time duration, int scheduleId)
 	{
 		setName(name);
 		setDescription(description);
@@ -53,7 +53,7 @@ public class Activity extends LifeObjective
 	 * These constructor are for getting data from the db. We can identify each activity by the actId, and when the activity is not in the database,
 	 * its actId will be -1. We can use this later to update our database.
 	 */
-	public Activity(String name, String description, int type, String place, Timestamp timeAndDate, Time duration, int actId, byte scheduleId)
+	public Activity(String name, String description, int type, String place, Timestamp timeAndDate, Time duration, int actId, int scheduleId)
 	{
 		setName(name);
 		setDescription(description);
@@ -72,6 +72,8 @@ public class Activity extends LifeObjective
 		this.placeAndTimes = null;
 	}
 	
+	public Activity() {}	// For creating dummy activity objects required to create PlaceAndTime objects.
+
 	/* 
 	 * Data structure with this class is more similar to sql database structure.
 	 * Should be easier to connect the two.
@@ -81,9 +83,9 @@ public class Activity extends LifeObjective
 		private String place;
 		private Timestamp timeAndDate;
 		private Time duration;
-		private byte scheduleId;
+		private int scheduleId;
 		
-		public PlaceAndTime(String place, Timestamp timeAndDate, Time duration, byte scheduleId)	
+		public PlaceAndTime(String place, Timestamp timeAndDate, Time duration, int scheduleId)	
 		{
 			setPlace(place);
 			setTimeAndDate(timeAndDate);
@@ -152,12 +154,12 @@ public class Activity extends LifeObjective
 			return returnString;
 		}
 
-		public byte getScheduleId()
+		public int getScheduleId()
 		{
 			return scheduleId;
 		}
 
-		public void setScheduleId(byte scheduleId)
+		public void setScheduleId(int scheduleId)
 		{
 			this.scheduleId = scheduleId;
 		}

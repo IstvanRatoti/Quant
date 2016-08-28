@@ -1,23 +1,29 @@
 package quant.gui;
 
-import java.sql.Time;
-import java.sql.Timestamp;
+import java.util.ArrayList;
+import java.util.List;
 
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
+import javafx.geometry.Insets;
 import javafx.scene.control.Button;
-import javafx.scene.control.ChoiceBox;
-import javafx.scene.control.DatePicker;
+import javafx.scene.control.ComboBox;
+import javafx.scene.control.Label;
+import javafx.scene.control.MenuButton;
+import javafx.scene.control.MenuItem;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
-import javafx.scene.layout.AnchorPane;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import javafx.util.Pair;
 
 import quant.connector.Query;
 import quant.core.Activity;
+import quant.core.Activity.PlaceAndTime;
+import quant.gui.util.PlaceAndTimeUtil;
 import quant.main.Main;
 
 public class DetailsWindowCont
@@ -26,29 +32,48 @@ public class DetailsWindowCont
 	private int actId = -2;		// Need this so we know which activity we edited, or if we created a new one. We use -2 because -1 means the activity is not in the database yet.
 	
 	@FXML
-	public AnchorPane ap;	// Just here so we can access the stage through it.
+	public Label descLabel;
+	@FXML
+	public HBox descBox;
+	
+	@FXML
+	public VBox baseBox;	// Just here so we can access the stage through it.
 	@FXML
 	public TextField name = new TextField();
 	@FXML
-	public TextField place = new TextField();
-	@FXML
-	public ChoiceBox<String> type = new ChoiceBox<String>();
+	public ComboBox<String> type = new ComboBox<String>();
 	@FXML
 	public TextArea desc = new TextArea();
 	@FXML
-	public DatePicker date = new DatePicker();
+	public VBox detailsBox;
 	@FXML
 	public Button acceptBtn;
 	@FXML
 	public Button cancelBtn;
 	
 	@FXML
+	MenuButton newEntryMenuBtn = new MenuButton();
+	@FXML
+	public MenuItem unscheduled = new MenuItem();
+	@FXML
+	public MenuItem scheduled = new MenuItem();
+	@FXML
+	public MenuItem deadline = new MenuItem();
+	@FXML
+	public MenuItem weekly = new MenuItem();
+	@FXML
+	public MenuItem daily = new MenuItem();
+	
+	@FXML
 	private void initialize()
 	{
 		this.type.setItems(FXCollections.observableArrayList("Obligatory", "Health", "Self-Improvement", "Recreational", "Charity", "Creative"));
+		HBox.setMargin(descBox, new Insets(5, 0, 0, 0));
 		
 		acceptBtn.setOnAction(e -> {	// Saves the data and closes the window.
 										Activity actToStore = null;
+										
+										List<Activity.PlaceAndTime> placeAndTimes = getPlaceAndTimeData();
 										
 										if(actId == -2)	// Creates a new activity and saves it.
 										{
@@ -56,14 +81,12 @@ public class DetailsWindowCont
 																			name.getText(), 
 																			desc.getText(), 
 																			this.intType, 
-																			place.getText(), 
-																			Timestamp.valueOf(date.getValue().atStartOfDay()), 
-																			new Time(0)
+																			placeAndTimes	//TODO: temporary scheduleId to be stored.
 																		);
 											Pair<SimpleStringProperty, Activity> newPair = new Pair<SimpleStringProperty, Activity>(new SimpleStringProperty(actToStore.getName()), actToStore);
 											Main.appData.add(newPair);
 											
-											((MainWindowCont) ap.getScene().getUserData()).addActBox(newPair);
+											((MainWindowCont) baseBox.getScene().getUserData()).addActBox(newPair);
 										}
 										else	// Updates an existing activity.
 										{
@@ -78,9 +101,7 @@ public class DetailsWindowCont
 													actToStore.setName(name.getText());
 													actToStore.setDescription(desc.getText());
 													actToStore.setType(this.intType);
-													actToStore.getPlaceAndTimes().get(0).setDuration(new Time(0));
-													actToStore.getPlaceAndTimes().get(0).setPlace(place.getText());
-													actToStore.getPlaceAndTimes().get(0).setTimeAndDate(Timestamp.valueOf(date.getValue().atStartOfDay()));
+													actToStore.setPlaceAndTimes(placeAndTimes);
 													break;
 												}
 											}
@@ -96,14 +117,12 @@ public class DetailsWindowCont
 											e1.printStackTrace();
 										}
 										
-										Stage stage = (Stage) ap.getScene().getWindow();
+										Stage stage = (Stage) baseBox.getScene().getWindow();
 										stage.close();
 									});
 		
 		cancelBtn.setOnAction(e -> {	// Closes the window, doesn't save anything.
-			
-										
-										Stage stage = (Stage) ap.getScene().getWindow();
+										Stage stage = (Stage) baseBox.getScene().getWindow();
 										stage.close();
 									});
 		
@@ -131,8 +150,55 @@ public class DetailsWindowCont
 																												break;
 																										}
 																									});
+		
+		unscheduled.setOnAction(e ->	{
+											VBox scheduleBox = PlaceAndTimeUtil.createScheduleBox(1, detailsBox, null);
+											detailsBox.getChildren().add(detailsBox.getChildren().indexOf(newEntryMenuBtn), scheduleBox);
+										});
+		scheduled.setOnAction(e ->	{
+										VBox scheduleBox = PlaceAndTimeUtil.createScheduleBox(2, detailsBox, null);
+										detailsBox.getChildren().add(detailsBox.getChildren().indexOf(newEntryMenuBtn), scheduleBox);
+									});
+		
+		deadline.setOnAction(e ->	{
+										VBox scheduleBox = PlaceAndTimeUtil.createScheduleBox(3, detailsBox, null);
+										detailsBox.getChildren().add(detailsBox.getChildren().indexOf(newEntryMenuBtn), scheduleBox);
+									});
+		
+		weekly.setOnAction(e ->	{
+									VBox scheduleBox = PlaceAndTimeUtil.createScheduleBox(4, detailsBox, null);
+									detailsBox.getChildren().add(detailsBox.getChildren().indexOf(newEntryMenuBtn), scheduleBox);
+								});
+		
+		daily.setOnAction(e -> 	{
+									VBox scheduleBox = PlaceAndTimeUtil.createScheduleBox(5, detailsBox, null);
+									detailsBox.getChildren().add(detailsBox.getChildren().indexOf(newEntryMenuBtn), scheduleBox);
+								});
+		
 	}
 	
+	private List<PlaceAndTime> getPlaceAndTimeData()	// Gets the data from our scheduleBoxes.
+	{
+		List<PlaceAndTime> placeAndTimes = null;
+		Object placeAndTimeElement = null;
+		int i = 1;
+		
+		// Goes through all the children of detailsBox after the type picker. Luckily, only the scheduleBox is a VBox.
+		while((placeAndTimeElement = detailsBox.getChildren().get(detailsBox.getChildren().indexOf(type) + i)).getClass()==VBox.class)	
+		{
+			if(i==1)		// If we have at least one scheduleBox, create a new list.
+				placeAndTimes = new ArrayList<Activity.PlaceAndTime>();
+			
+			PlaceAndTimeUtil placeAndTimeData =(PlaceAndTimeUtil) ((VBox) placeAndTimeElement).getUserData();	// The scheduleBox's user data contains the pretty PlaceAndTime object we need.
+			placeAndTimeData.getData(); 
+			placeAndTimes.add(placeAndTimeData.placeAndTime);	// Not very pretty...public class variable, so we can do this, but we should use setters and getters.
+			
+			i++;
+		}
+			
+		return placeAndTimes;
+	}
+
 	// Used to edit existing activities. Sets the data.
 	public void setData(Activity act)
 	{
@@ -141,8 +207,14 @@ public class DetailsWindowCont
 		this.name.setText(act.getName());
 		this.desc.setText(act.getDescription());
 		
-		this.place.setText(act.getPlaceAndTimes().get(0).getPlace());
-		this.date.setValue(act.getPlaceAndTimes().get(0).getTimeAndDate().toLocalDateTime().toLocalDate());
+		if(act.getPlaceAndTimes() != null)	// Creates all scheduleBoxes if they are needed.
+		{
+			for(PlaceAndTime placeAndTime : act.getPlaceAndTimes())	
+			{
+				VBox scheduleBox =PlaceAndTimeUtil.createScheduleBox(PlaceAndTimeUtil.getScheduleId(placeAndTime), detailsBox, placeAndTime);
+				detailsBox.getChildren().add(detailsBox.getChildren().indexOf(newEntryMenuBtn), scheduleBox);
+			}
+		}
 		
 		this.intType = act.getIntType();
 		switch(act.getIntType())		// "Translates" the numbers stored in the database to human understandable types.
