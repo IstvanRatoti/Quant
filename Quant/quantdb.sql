@@ -14,7 +14,8 @@ CREATE TABLE Timetable(		-- second table with time and place data
 	actId INT(6),			-- use this to join with activites table
 	actDate DATETIME,		-- date AND time, format: YYYY-MM-DD HH:MI:SS
 	place varchar(255),
-	duration TIME
+	duration TIME,
+	scheduleId INT(6)
 );
 
 INSERT						-- putting some data in for testing
@@ -36,10 +37,13 @@ INTO
 		actId,
 		actDate,
 		place,
-		duration
+		duration,
+		scheduleId
 	)
 VALUES(
 	1,						-- actId, should have a "pair" in the activites table
 	"2017-01-01 12:00",		-- datetime format, mentioned above
-	"home"
+	"home",
+	0,
+	0
 );
