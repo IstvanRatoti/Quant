@@ -10,6 +10,7 @@ import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.control.ScrollPane.ScrollBarPolicy;
 import javafx.scene.layout.*;
+import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.util.Pair;
 import quant.connector.Query;
@@ -29,13 +30,19 @@ public class MainWindowCont
 	
 	@FXML
 	protected void initialize()
-	{
+	{	
+		if(Main.connection == null)
+			addBtn.setDisable(true);
+		
 		actListScroll.setFitToWidth(true);
 		actListScroll.setContent(actList);
 		actListScroll.setVbarPolicy(ScrollBarPolicy.ALWAYS);	// Always shows the scroll bar, so it wont look slly when it appears.
 		
-		for(Pair<SimpleStringProperty, Activity> actPair : Main.appData)	// Adds the activities from the database.
-			addActBox(actPair);
+		if( Main.appData != null)
+		{
+			for(Pair<SimpleStringProperty, Activity> actPair : Main.appData)	// Adds the activities from the database.
+				addActBox(actPair);
+		}
 		
 		addBtn.setOnAction(e -> {	// Button action, opens a new details window for a new activity. Also passes the parent object for modifying.
 									FXMLLoader loader = new FXMLLoader(this.getClass().getResource("/quant/gui/DetailsWindow.fxml"));
@@ -57,10 +64,39 @@ public class MainWindowCont
 			
 									detailsStage.setTitle("New Activity");
 									detailsStage.setScene(detailsScene);
+									
+									detailsStage.initModality(Modality.WINDOW_MODAL);
+									detailsStage.initOwner(addBtn.getScene().getWindow());
+
 									detailsStage.show();
 								});
 		
-		optionsBtn.setOnAction(e -> System.out.println("Options windows dummy."));	// Dummy for options, to be implemented.
+		optionsBtn.setOnAction(e -> {
+										FXMLLoader loader = new FXMLLoader(this.getClass().getResource("/quant/gui/SettingsWindow.fxml"));
+			
+										Parent settingsWindow = null;
+										try
+										{
+											settingsWindow = loader.load();
+										}
+										catch (Exception e1)
+										{
+											e1.printStackTrace();
+										}
+
+										Scene settingsScene = new Scene(settingsWindow);
+										settingsScene.setUserData(this);
+
+										Stage settingsStage = new Stage();
+
+										settingsStage.setTitle("Options");
+										settingsStage.setScene(settingsScene);
+										
+										settingsStage.initModality(Modality.WINDOW_MODAL);
+										settingsStage.initOwner(optionsBtn.getScene().getWindow());
+										
+										settingsStage.showAndWait();
+									});
 	}
 	
 	// Adds a new activity entry. Needed for adding new entries outside the initialization.
@@ -96,6 +132,10 @@ public class MainWindowCont
 											
 											detailsStage.setTitle("Activity Details");
 											detailsStage.setScene(detailsScene);
+											
+											detailsStage.initModality(Modality.WINDOW_MODAL);		// These 2 make it impossible to choose the main window when
+											detailsStage.initOwner(addBtn.getScene().getWindow());	// the details window is shown.
+											
 											detailsStage.show();
 										});
 		

@@ -2,6 +2,7 @@ package quant.gui.util;
 
 import java.sql.Time;
 import java.sql.Timestamp;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
@@ -87,6 +88,8 @@ public class PlaceAndTimeUtil	// Creates the schedule boxes, and contains inform
 			DatePicker date = new DatePicker();
 			if(data != null)
 				date.setValue(data.getTimeAndDate().toLocalDateTime().toLocalDate());
+			else
+				date.setValue(LocalDate.now());
 			dateBox.getChildren().add(date);
 			HBox.setMargin(date, new Insets(5, 5, 0, 0));
 			break;
@@ -96,6 +99,8 @@ public class PlaceAndTimeUtil	// Creates the schedule boxes, and contains inform
 			DatePicker deadline = new DatePicker();
 			if(data != null)
 				deadline.setValue(data.getTimeAndDate().toLocalDateTime().toLocalDate());
+			else
+				deadline.setValue(LocalDate.now());
 			HBox.setMargin(deadline, new Insets(5, 5, 0, 0));
 			dateBox.getChildren().add(deadline);
 			break;
@@ -361,6 +366,8 @@ public class PlaceAndTimeUtil	// Creates the schedule boxes, and contains inform
 		TextField place = new TextField();
 		if (placeData != null)
 			place.setText(placeData);
+		else
+			place.setText("home");
 		
 		HBox.setMargin(place, new Insets(5, 5, 0, 0));
 		
@@ -398,6 +405,8 @@ public class PlaceAndTimeUtil	// Creates the schedule boxes, and contains inform
 		}
 		else if(data != null)	// Sets the duration clock.
 			time1.setClock(data.getDuration());
+		else
+			time1.setDefault();
 		
 		timeBox.getChildren().addAll(timeLabel1, time1);
 		
@@ -410,6 +419,8 @@ public class PlaceAndTimeUtil	// Creates the schedule boxes, and contains inform
 				DigitalClock time2 = this.new DigitalClock();
 				if(data != null)
 					time2.setClock(data.getDuration());
+				else
+					time2.setDefault();
 				timeBox.getChildren().addAll(timeLabel2, time2);
 				break;
 			case 2:
@@ -620,6 +631,12 @@ public class PlaceAndTimeUtil	// Creates the schedule boxes, and contains inform
 		{
 			this.minutes.setValue(minutes);
 			this.hours.setValue(hours);
+		}
+		
+		public void setDefault()
+		{
+			this.hours.setValue(12);
+			this.minutes.setValue(0);
 		}
 	}
 }

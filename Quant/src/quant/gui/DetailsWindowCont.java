@@ -67,7 +67,10 @@ public class DetailsWindowCont
 	@FXML
 	private void initialize()
 	{
+		acceptBtn.setDisable(true);	// Accept Button on a new window will be disabled by default.
+		
 		this.type.setItems(FXCollections.observableArrayList("Obligatory", "Health", "Self-Improvement", "Recreational", "Charity", "Creative"));
+		this.type.setValue("Obligatory");
 		HBox.setMargin(descBox, new Insets(5, 0, 0, 0));
 		
 		acceptBtn.setOnAction(e -> {	// Saves the data and closes the window.
@@ -150,6 +153,14 @@ public class DetailsWindowCont
 																												break;
 																										}
 																									});
+		
+		name.textProperty().addListener(				// This one makes sure that we can only add or change an activity if it has a name
+				(observable, oldValue, newValue) ->	{
+														if(newValue.isEmpty())
+															acceptBtn.setDisable(true);
+														else
+															acceptBtn.setDisable(false);
+													});
 		
 		unscheduled.setOnAction(e ->	{
 											VBox scheduleBox = PlaceAndTimeUtil.createScheduleBox(1, detailsBox, null);
